@@ -1,17 +1,17 @@
 <template>
   <div id="app" v-loading="loading">
     <div id="login_header">
-      <h1>Fruit ERP Management System</h1>
+      <h1>果时 ERP 管理系统</h1>
     </div>
     <div class="info">
       <div class="buttons">
         <p>
-          <a class="modal__trigger" @click="ShowLoginBox()">Login</a>
-          <a class="modal__trigger" @click="ShowRegisBox()">Regis</a>
-          <a class="modal__trigger">Amend</a>
+          <a class="modal__trigger" @click="ShowLoginBox()">登 录</a>
+          <a class="modal__trigger" @click="ShowRegisBox()">注 册</a>
+          <a class="modal__trigger">关 于</a>
         </p>
       </div>
-      <p class="tip">Click a button to activate a modal.</p>
+      <p class="tip">展示版用户名admin,密码admin</p>
       <br />
     </div>
 
@@ -25,7 +25,7 @@
           <path d="M0 0h24v24h-24z" fill="none" />
         </svg>
       </button>
-      <h1 id="lean">Login</h1>
+      <h1 id="lean">登 录</h1>
       <div id="login_Ifo">
         <el-form label="活动名称">
           <div>
@@ -36,7 +36,7 @@
               class="login_Ipt"
               type="text"
               v-model="Account"
-              placeholder="Username"
+              placeholder="账号"
             />
             <span>
               <i
@@ -53,7 +53,7 @@
               class="login_Ipt"
               type="password"
               v-model="Password"
-              placeholder="Password"
+              placeholder="密码"
             />
             <span>
               <i
@@ -64,7 +64,7 @@
           </div>
         </el-form>
         <el-row>
-          <el-button id="login_Btn" @click="linkto()">Login</el-button>
+          <el-button id="login_Btn" @click="linkto()">登 录</el-button>
         </el-row>
       </div>
     </el-card>
@@ -79,7 +79,7 @@
           <path d="M0 0h24v24h-24z" fill="none" />
         </svg>
       </button>
-      <h1 id="lean2">Register</h1>
+      <h1 id="lean2">注 册</h1>
       <div id="register_Ifo">
         <el-form label="活动名称">
           <div>
@@ -90,7 +90,7 @@
               class="login_Ipt"
               type="text"
               v-model="registerUsername"
-              placeholder="Account"
+              placeholder="账号"
             />
             <span>
               <i class="fa fa-times-circle-o"></i>
@@ -104,7 +104,7 @@
               class="login_Ipt"
               type="password"
               v-model="registerPassword"
-              placeholder="Password"
+              placeholder="密码"
             />
             <span>
               <i class="fa fa-times-circle-o"></i>
@@ -126,7 +126,7 @@
           </div> -->
         </el-form>
         <el-row>
-          <el-button id="login_Btn" v-on:click="register()">Confirm</el-button>
+          <el-button id="login_Btn" v-on:click="register()">确 认</el-button>
         </el-row>
       </div>
     </el-card>

@@ -1,75 +1,67 @@
 <template>
-  <div class="head" v-loading="loading">
-    <!-- 主页头部导航 -->
-    <div id="head-nav">
-      <div class="logo">
-        <span><i class="el-icon-eleme logo_ico"></i></span>
-        <span>果时REP管理系统</span>
-      </div>
-      <i class="fa fa-bar-chart" id="chart"></i>
-      <i class="fa fa-cog" style="color: #97bbf5" id="set"></i>
-      <i class="fa fa-bell-o" style="color: #97bbf5" id="bell"></i>
-      <!-- <div id="search">
-        <input type="text" id="ipt-search" placeholder="Search">
-        <i class="fa fa-search"></i>
-      </div> -->
+  <!-- <div class="head" v-loading="loading">
+ 
 
-      <div class="user_head" @click="headBox()">
-        <div id="headshot">
-          <img
-            src="./../../../assets/user-4.png"
-            width="100%"
-            style="border-radius: 10px; cursor: pointer"
-          />
+  </div> -->
+  <div id="head-nav">
+    <div class="logo">
+      <span><i class="el-icon-eleme logo_ico"></i></span>
+      <span>果时ERP管理系统</span>
+    </div>
+    <i class="fa fa-bar-chart" id="chart"></i>
+    <i class="fa fa-cog" style="color: #97bbf5" id="set"></i>
+    <i class="fa fa-bell-o" style="color: #97bbf5" id="bell"></i>
 
-          <!-- 用户点击后的模态框 -->
-          <div id="box-head">
-            <div @click="dialogVisible = true">
-              <i class="fa fa-user-o"></i>
-              <span>Profile</span>
-            </div>
-            <div>
-              <i class="fa fa-cog"></i>
-              <span>Set</span>
-            </div>
-            <p id="line"></p>
-            <div
-              id="Logout"
-              @click="logOut()"
-              @click.stop="userClick = !userClick"
-            >
-              <i class="fa fa-sign-out"></i>
-              <span>Logout</span>
-            </div>
+    <div class="user_head" @click="headBox()">
+      <div id="headshot">
+        <img
+          src="./../../../assets/lime-998903__340.jpg"
+          width="100%"
+          style="border-radius: 10px; cursor: pointer"
+        />
+
+        <!-- 用户点击后的模态框 -->
+        <div id="box-head">
+          <div @click="dialogVisible = true">
+            <i class="fa fa-user-o"></i>
+            <span>主页</span>
           </div>
-
-          <el-dialog
-            title="用户信息"
-            :visible.sync="dialogVisible"
-            width="30%"
-            class="user_info"
+          <div>
+            <i class="fa fa-cog"></i>
+            <span>设置</span>
+          </div>
+          <p id="line"></p>
+          <div
+            id="Logout"
+            @click="logOut()"
+            @click.stop="userClick = !userClick"
           >
-            <span>用户信息</span>
-            <span slot="footer" class="dialog-footer">
-              <el-button
-                type="primary"
-                class="user_info_btn"
-                @click="dialogVisible = false"
-                >确 定</el-button
-              >
-            </span>
-          </el-dialog>
+            <i class="fa fa-sign-out"></i>
+            <span>退出系统</span>
+          </div>
         </div>
-        <div class="user_name">
-          <span>Buzz Lightyear</span>
-          <span><i class="el-icon-arrow-down name_arrow"></i></span>
-        </div>
-      </div>
 
-      <!-- <a href="#" class="head_btn">Cus-service</a>
-      <a href="#" class="head_btn">Q&A</a>
-      <a href="#" class="head_btn">Help</a>
-      <a href="#" class="head_btn">Home</a> -->
+        <el-dialog
+          title="用户信息"
+          :visible.sync="dialogVisible"
+          width="30%"
+          class="user_info"
+        >
+          <span>用户信息</span>
+          <span slot="footer" class="dialog-footer">
+            <el-button
+              type="primary"
+              class="user_info_btn"
+              @click="dialogVisible = false"
+              >确 定</el-button
+            >
+          </span>
+        </el-dialog>
+      </div>
+      <div class="user_name">
+        <span>admin</span>
+        <span><i class="el-icon-arrow-down name_arrow"></i></span>
+      </div>
     </div>
   </div>
 </template>
@@ -118,7 +110,6 @@ export default {
         sessionStorage.removeItem("staffId");
       }, 2000);
     },
-
     // 用户信息
     handleClose(done) {
       this.$confirm("确认关闭？")
@@ -136,21 +127,18 @@ export default {
   margin: 0px;
   padding: 0px;
 }
-
 .head {
   width: 100%;
   height: 100%;
 }
-
 //头部导航栏
 #head-nav {
   border: 0px;
   width: 100%;
   height: 100%;
   background-color: white;
-  z-index: 111;
+  // z-index: 111;
 }
-
 .logo {
   color: #fff;
   line-height: 60px;
@@ -164,12 +152,10 @@ export default {
   padding-left: 20px;
   padding-right: 80px;
 }
-
 .logo > span {
   // float: left;
   color: #fff;
 }
-
 .logo_ico {
   width: 30px;
   // padding-left: 30px;
@@ -177,7 +163,6 @@ export default {
   line-height: 45px !important;
   // float: left;
 }
-
 #chart {
   float: left;
   border: 0px;
@@ -194,12 +179,10 @@ export default {
   transition: all 0.3s;
   margin-top: 10px;
 }
-
 #chart:hover {
   background-color: #97bbf5;
   color: white;
 }
-
 /* 搜索格 */
 // #search {
 //   float: left;
@@ -210,7 +193,6 @@ export default {
 //   background-color: rgb(230, 239, 240);
 //   margin-top: 10px;
 // }
-
 // #ipt-search {
 //   border: 0px;
 //   outline: 0;
@@ -219,7 +201,6 @@ export default {
 //   height: 40px;
 //   margin-left: 10px;
 // }
-
 #head-nav > div > i {
   font-size: 20px;
   color: rgb(133, 132, 132);
@@ -228,7 +209,6 @@ export default {
   line-height: 40px;
   cursor: pointer;
 }
-
 /* 用户头像 */
 .user_head {
   width: 250px;
@@ -236,12 +216,10 @@ export default {
   float: right;
   cursor: pointer;
 }
-
 .user_head:hover .user_name {
   color: #000;
   transition: all 0.3s;
 }
-
 #headshot {
   border: 0px;
   width: 40px;
@@ -251,7 +229,6 @@ export default {
   margin-top: 10px;
   float: left;
 }
-
 .user_name {
   height: 60px;
   width: 200px;
@@ -263,13 +240,11 @@ export default {
   color: #979898;
   transition: all 0.3s;
 }
-
 .name_arrow {
   font-size: 13px !important;
   margin-left: 5px;
   font-weight: 600 !important;
 }
-
 #box-head {
   width: 250px;
   height: 160px;
@@ -288,7 +263,6 @@ export default {
   top: 45px;
   right: 30px;
 }
-
 #box-head > div {
   width: 100%;
   height: 40px;
@@ -300,15 +274,12 @@ export default {
   color: rgb(105, 105, 105);
   overflow: hidden;
 }
-
 #box-head > p {
   margin-bottom: 10px;
 }
-
 #box-head > div:hover {
   background-color: rgb(233, 232, 232);
 }
-
 #line {
   height: 1px;
   background-color: rgb(233, 233, 233);
@@ -323,7 +294,6 @@ export default {
 .head_btn {
   margin-top: 10px;
 }
-
 #set,
 #bell {
   border: 0px;
@@ -340,17 +310,14 @@ export default {
   transition: all 0.3s;
   margin-top: 10px;
 }
-
 #set:hover {
   color: white !important;
   background-color: #97bbf5;
 }
-
 #bell:hover {
   color: white !important;
   background-color: #97bbf5;
 }
-
 #head-nav > a {
   text-decoration: none;
   border: 0px;
@@ -368,12 +335,10 @@ export default {
   float: right;
   transition: all 0.3s;
 }
-
 #head-nav > a:hover {
   color: white;
   background-color: #97bbf5;
 }
-
 div > i {
   width: 20px;
 }

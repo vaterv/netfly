@@ -6,14 +6,9 @@ import store from './store'
 import 'font-awesome/css/font-awesome.min.css'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
-// import Axios from 'axios'
 import Axios from './util/axios'
 import moment from 'moment'
 import * as echarts from 'echarts';
-
-// 引入dayjs
-import dayjs from 'dayjs'
-Vue.prototype.$dayjs=dayjs;
 
 Vue.config.productionTip = false
 Vue.prototype.$axios = Axios;

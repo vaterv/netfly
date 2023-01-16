@@ -1,32 +1,44 @@
 <template>
   <!-- 库位管理 -->
   <div>
-    <el-card>
-      <el-form :inline="true" class="demo-form-inline">
-        <el-form-item label="选择仓库">
-          <el-select
-            v-model="warehouseId"
-            placeholder="请选择仓库"
-            @change="getWarehouseLocation"
-          >
-            <el-option
-              :label="item.name"
-              :value="item.id"
-              v-for="item in warehouseData"
-              :key="item.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-    </el-card>
+    <div class="contralBox">
+      <el-card>
+        <el-form :inline="true" class="demo-form-inline">
+          <el-form-item label="选择仓库">
+            <el-select
+              v-model="warehouseId"
+              placeholder="请选择仓库"
+              @change="getWarehouseLocation"
+            >
+              <el-option
+                :label="item.name"
+                :value="item.id"
+                v-for="item in warehouseData"
+                :key="item.id"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              type="success"
+              @click="refresh"
+              icon="el-icon-refresh"
+              class="refresh"
+            ></el-button>
+          </el-form-item>
+        </el-form>
+      </el-card>
+    </div>
     <el-card>
       <el-form>
         <el-form-item>
-          <el-button type="primary" @click="add">新增</el-button>
+          <el-button type="primary" @click="addDialog = true">新增</el-button>
           <el-button type="primary" @click="checkGoods">查看库位商品</el-button>
-          <el-button type="primary">导出</el-button>
+          <el-button type="primary" @click="download">导出</el-button>
         </el-form-item>
       </el-form>
+      <el-divider></el-divider>
+
       <el-table
         :data="tableData"
         style="width: 100%"
@@ -105,6 +117,7 @@
             v-model="modifyData.zoneId"
             placeholder="请选择库区"
             class="iptCount"
+            @change="verificationFn"
           >
             <el-option
               v-for="item in zoneData"
@@ -119,6 +132,7 @@
             v-model="modifyData.rowCount"
             class="iptCount"
             maxlength="2"
+            @blur="verificationFn"
           ></el-input>
         </el-form-item>
         <el-form-item label="库位列数" prop="colCount">
@@ -126,6 +140,7 @@
             v-model="modifyData.colCount"
             class="iptCount"
             maxlength="2"
+            @blur="verificationFn"
           ></el-input>
         </el-form-item>
         <el-form-item label="库位层数" prop="layerCount">
@@ -133,6 +148,7 @@
             v-model="modifyData.layerCount"
             class="iptCount"
             maxlength="2"
+            @blur="verificationFn"
           ></el-input>
         </el-form-item>
         <el-form-item label="库位存量" prop="totalCapacity">
@@ -162,6 +178,7 @@
             v-model="addData.zoneId"
             placeholder="请选择库区"
             class="iptCount"
+            @change="verificationFn"
           >
             <el-option
               v-for="item in zoneData"
@@ -176,6 +193,7 @@
             v-model="addData.rowCount"
             class="iptCount"
             maxlength="2"
+            @blur="verificationFn"
           ></el-input>
         </el-form-item>
         <el-form-item label="库位列数" prop="colCount">
@@ -183,6 +201,7 @@
             v-model="addData.colCount"
             class="iptCount"
             maxlength="2"
+            @blur="verificationFn"
           ></el-input>
         </el-form-item>
         <el-form-item label="库位层数" prop="layerCount">
@@ -190,6 +209,7 @@
             v-model="addData.layerCount"
             class="iptCount"
             maxlength="2"
+            @blur="verificationFn"
           ></el-input>
         </el-form-item>
         <el-form-item label="库位存量" prop="totalCapacity">
@@ -197,8 +217,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="addDialog = false">取 消</el-button>
-        <el-button type="primary" @click="addSure">确 定</el-button>
+        <el-button @click="closeAdd">取 消</el-button>
+        <el-button type="primary" @click="add">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -231,11 +251,12 @@
 </template>
 
 <script>
+import CsvExportor from "csv-exportor"; //npm i csv-exportor --save
 export default {
   name: "Location",
   data() {
     return {
-      tableCheckedId: null, // 表格选中的id
+      tableCheckedData: null, // 表格选中的id
       currentPage: 1, // 当前页
       pageSize: 10, // 每页显示条数
       pageTotal: null, // 数据总条数
@@ -267,6 +288,7 @@ export default {
       warehouseId: null, // 仓库ID
       zoneData: [], // 库区数据
       zoneId: null, //库区ID
+      flag: false, // 用于正则验证
 
       // 规则
       rules: {
@@ -295,10 +317,10 @@ export default {
           },
         ],
         totalCapacity: [
-          { required: true, message: "请输入库位层数", trigger: "blur" },
+          { required: true, message: "请输入库位总容量", trigger: "blur" },
           {
             message: "库位层数是大于0的正整数",
-            pattern: /^[1-9]\d*$/,
+            pattern: /^0[1-9]|[1-9]\d*$/,
             trigger: "blur",
           },
         ],
@@ -308,15 +330,15 @@ export default {
   methods: {
     // 分页
     handleSizeChange(val) {
-      this.pageSize = val;
       this.getWarehouseLocation();
+      this.pageSize = val;
     },
     handleCurrentChange(val) {
-      this.currentPage = val;
       this.getWarehouseLocation();
+      this.currentPage = val;
     },
 
-    // 获取表格数据当前行的id
+    // 获取表格数据当前行的id(多用于跨页多选的情况)
     getRowKeys(row) {
       return row.locationId;
     },
@@ -328,7 +350,7 @@ export default {
         method: "get",
       })
         .then((res) => {
-          console.log("仓库数据", res.data.data);
+          // console.log("仓库数据", res.data.data);
           if (res.data.code === 0) {
             this.warehouseData = res.data.data;
           }
@@ -365,7 +387,7 @@ export default {
         },
       })
         .then((res) => {
-          // console.log("库位数据", res.data);
+          console.log("库位数据", res.data.data);
           this.pageTotal = res.data.count;
           this.tableData = res.data.data;
         })
@@ -376,46 +398,62 @@ export default {
 
     // 表格内容的复选框是否选中
     handleSelectionChange(v) {
-      this.tableCheckedId = v;
-      // console.log(v); // 3
+      this.tableCheckedData = v;
+      // console.log(this.tableCheckedData); // 3
     },
 
-    /* 新增库位 */
+    // 确认新增库位
     add() {
-      this.addDialog = true;
+      // console.log(this.addData.rowCount.length);
+      if (this.addflag == true) {
+        this.$message({
+          type: "error",
+          message: "改库位已存在",
+        });
+        this.addflag = false;
+      } else {
+        // 发起axios请求
+        this.$axios({
+          url: "/warehouseLocation/add",
+          method: "post",
+          data: {
+            col:
+              this.addData.colCount.length === 1
+                ? `0${this.addData.colCount}`
+                : this.addData.colCount,
+            layer:
+              this.addData.layerCount.length === 1
+                ? `0${this.addData.layerCount}`
+                : this.addData.layerCount,
+            row:
+              this.addData.rowCount.length === 1
+                ? `0${this.addData.rowCount}`
+                : this.addData.rowCount,
+            stock: Number(this.addData.totalCapacity),
+            zoneId: this.addData.zoneId,
+          },
+        })
+          .then((res) => {
+            // console.log(res);
+            if (res.data.code === 0) {
+              this.getWarehouseLocation();
+              this.closeAdd();
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
     },
 
-    // 确认新增
-    addSure() {
-      console.log(this.addData.rowCount.length);
-      // 发起axios请求
-      this.$axios({
-        url: "/warehouseLocation/add",
-        method: "post",
-        data: {
-          col:
-            this.addData.colCount.length === 1
-              ? `0${this.addData.colCount}`
-              : this.addData.colCount,
-          layer:
-            this.addData.layerCount.length === 1
-              ? `0${this.addData.layerCount}`
-              : this.addData.layerCount,
-          row:
-            this.addData.rowCount.length === 1
-              ? `0${this.addData.rowCount}`
-              : this.addData.rowCount,
-          stock: Number(this.addData.totalCapacity),
-          zoneId: this.addData.zoneId,
-        },
-      })
-        .then((res) => {
-          console.log(res);
-          this.addDialog = false;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+    // 关闭模态框并清空数据
+    closeAdd() {
+      this.addDialog = false;
+      this.addData.zoneId = null;
+      this.addData.rowCount = "";
+      this.addData.colCount = "";
+      this.addData.layerCount = "";
+      this.addData.totalCapacity = "";
     },
 
     // 修改库位使用状态
@@ -441,20 +479,20 @@ export default {
 
     /* 查看库位商品详细 */
     checkGoods() {
-      if (this.tableCheckedId == null) {
+      if (this.tableCheckedData == null) {
         this.$message({
           type: "error",
           message: "请选择一个库位信息",
         });
       } else {
-        // console.log(this.tableCheckedId);
+        // console.log(this.tableCheckedData);
         this.goodsInfoDialog = true;
         // 发起axios请求，查看库位的商品详情
         this.$axios({
           url: "/warehouseLocationAdjust/findGoodsDataByLocationId",
           method: "get",
           params: {
-            locationId: this.tableCheckedId[0].locationId,
+            locationId: this.tableCheckedData[0].locationId,
           },
         })
           .then((res) => {
@@ -488,7 +526,7 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           if (res.data.code === 0) {
             this.getWarehouseLocation();
           }
@@ -507,6 +545,7 @@ export default {
       this.modifyData.rowCount = row.row;
       this.modifyData.colCount = row.col;
       this.modifyData.layerCount = row.layer;
+      this.modifyData.totalCapacity = row.stock;
     },
 
     // 确认修改
@@ -543,6 +582,90 @@ export default {
           console.log(err);
         });
     },
+
+    // 刷新
+    refresh() {
+      this.warehouseId = null;
+      this.getWarehouseLocation();
+    },
+
+    // 导出
+    download() {
+      let exportData = []; // 要导出的数据
+      let obj = {}; //
+      let tableHeader = [
+        "库位编码",
+        "仓库名称",
+        "存量",
+        "已有容量",
+        "是否停用",
+      ];
+      if (this.tableCheckedData.length > 0) {
+        this.tableCheckedData.map((item) => {
+          obj = {
+            number: item.number,
+            warehouseName: item.warehouseName,
+            stock: item.stock,
+            usedCapacity: item.usedCapacity,
+            startStatus: item.startStatus === 1 ? "禁用" : "启用",
+          };
+          exportData.push(obj);
+        });
+      } else {
+        this.tableData.map((item) => {
+          obj = {
+            number: item.number,
+            warehouseName: item.warehouseName,
+            stock: item.stock,
+            usedCapacity: item.usedCapacity,
+            startStatus: item.startStatus === 1 ? "禁用" : "启用",
+          };
+          exportData.push(obj);
+        });
+      }
+      CsvExportor.downloadCsv(
+        exportData,
+        { header: tableHeader },
+        "库位信息表.csv"
+      );
+    },
+
+    // 正则验证
+    verificationFn() {
+      // this.addData.colCount =
+      //   this.addData.colCount.length === 1
+      //     ? `0${this.addData.colCount}`
+      //     : this.addData.colCount;
+      // this.addData.layerCount =
+      //   this.addData.layerCount.length === 1
+      //     ? `0${this.addData.layerCount}`
+      //     : this.addData.layerCount;
+      // this.addData.rowCount =
+      //   this.addData.rowCount.length === 1
+      //     ? `0${this.addData.rowCount}`
+      //     : this.addData.rowCount;
+      // console.log(typeof this.addData.colCount);
+
+      this.tableData.forEach((item) => {
+        if (
+          this.addData.rowCount == item.row &&
+          this.addData.zoneId == item.zoneId &&
+          this.addData.colCount == item.col &&
+          this.addData.layerCount == item.layer
+        ) {
+          this.addflag = true;
+        }
+
+        if (
+          this.modifyData.rowCount == item.row &&
+          this.modifyData.zoneId == item.zoneId &&
+          this.modifyData.colCount == item.col &&
+          this.modifyData.layerCount == item.layer
+        ) {
+          this.flag = true;
+        }
+      });
+    },
   },
 
   mounted() {
@@ -554,6 +677,16 @@ export default {
 </script>
 
 <style scoped>
+.contralBox {
+  width: 100%;
+  margin-bottom: 20px;
+}
+.el-card {
+  width: 90%;
+  margin: 0 5%;
+  position: relative;
+  top: 20px;
+}
 #title {
   background-color: rgba(211, 208, 208, 0.627);
   height: 40px;

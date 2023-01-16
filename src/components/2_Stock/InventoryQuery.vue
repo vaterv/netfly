@@ -28,6 +28,14 @@
         <el-form-item>
           <el-button type="primary" @click="getInventoryData">查询</el-button>
         </el-form-item>
+        <el-form-item>
+          <el-button
+            type="success"
+            @click="refresh"
+            icon="el-icon-refresh"
+            class="refresh"
+          ></el-button>
+        </el-form-item>
       </el-form>
     </el-card>
     <el-card>
@@ -197,7 +205,7 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res);
+          console.log("11", res.data.data);
           if (res.data.code === 0) {
             this.tableData = res.data.data;
             this.pageTotal = res.data.count;
@@ -255,7 +263,20 @@ export default {
           .catch((err) => {
             console.log(err);
           });
+      } else {
+        this.$message({
+          type: "error",
+          message: "请选择一个商品信息",
+        });
       }
+    },
+
+    // 刷新
+    refresh() {
+      this.formData.goodsName = "";
+      this.formData.goodsNumber = "";
+      this.formData.warehouseName = "";
+      this.getInventoryData();
     },
 
     // 导出
@@ -275,8 +296,8 @@ export default {
             goodsCode: item.goodsNumber,
             goodsName: item.goodsName,
             number: item.number,
-            warehouseName: item.warehouseName,
             company: item.warehouseUsefulUnit,
+            warehouseName: item.warehouseName,
           };
           exportData.push(obj);
         });
@@ -286,16 +307,16 @@ export default {
             goodsCode: item.goodsNumber,
             goodsName: item.goodsName,
             number: item.number,
-            warehouseName: item.warehouseName,
             company: item.warehouseUsefulUnit,
+            warehouseName: item.warehouseName,
           };
           exportData.push(obj);
         });
       }
       CsvExportor.downloadCsv(
-        csvData,
+        exportData,
         { header: tableHeader },
-        "商品库存查询.csv"
+        "商品库存查询表.csv"
       );
     },
   },

@@ -5,7 +5,7 @@
     text-color="rgb(206, 206, 206)"
     active-text-color="#fff"
     id="menu_box"
-    :default-openeds="['2']"
+    :default-openeds="['2', '6', '7']"
     :router="true"
   >
     <template v-for="item in list">
@@ -23,8 +23,8 @@
 
         <!-- 第二循环 -->
         <!-- <el-menu-item v-if="itemm.submenus.length === 0">
-                    {{ itemm.name }}
-                    </el-menu-item> -->
+                      {{ itemm.name }}
+                      </el-menu-item> -->
         <template
           :style="{ height: item.height }"
           v-for="itemm in item.submenus"
@@ -58,8 +58,8 @@
     </template>
   </el-menu>
 </template>
-
-<script>
+  
+  <script>
 export default {
   name: "LeftMenu",
   data() {
@@ -80,6 +80,6 @@ export default {
   },
 };
 </script>
-
-<style>
+  
+  <style>
 </style>

@@ -10,7 +10,7 @@
             <el-form>
               <el-form-item label="订单号" label-width="126px" :rules="[{ required: true, message: '订单号不能为空' }]"
                 prop="inputOrderNum" size="medium">
-                <el-input v-model="inputOrderNum"></el-input>
+                <el-input v-model="inputOrderNum" @blur="orderCheck"></el-input>
               </el-form-item>
             </el-form>
           </el-col>
@@ -103,6 +103,9 @@
           </template>
         </el-table-column>
         <el-table-column label="商品信息" width="120" prop="goodsId">
+          <template slot-scope="scope">
+            {{ goodsInfoFormatChange(scope.row.goodsId) }}
+          </template>
         </el-table-column>
         <el-table-column label="实付金额" width="80" prop="realPay">
         </el-table-column>
@@ -163,6 +166,16 @@ export default {
   data() {
     return {
       value: true,
+      // 获取商品表、
+      // 所有的商品
+      goodsAllTable: [],
+
+      // 装商品表的id
+      goodsIdTable: [],
+      // 装商品表的名字
+      goodsNameTable: [],
+
+
 
       //添加时间
       orderTime: "",
@@ -245,6 +258,35 @@ export default {
   mounted() {
     //使用后端分页函数
     //this.getLimitTableData(1);
+
+    // 获取商品表中的数据
+
+
+    this.$axios({
+      method: "get",
+      url: "/goodsData/findAll",
+    })
+      .then((res) => {
+        if (res) {
+          console.log("0服务器返回的商品数据是", res.data.data);
+          // 用遍历的方法把数组对象中的id装到新的数组中
+          this.goodsAllTable = res.data.data;
+          this.goodsAllTable.forEach((item) => {
+            this.goodsIdTable.push(item.id);
+          })
+          // 最后查看这个数组
+          console.log('得到的id数组是', this.goodsIdTable);
+
+        } else {
+          console.log("出错了");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+
+
   },
   methods: {
     //格式转换函数
@@ -273,6 +315,23 @@ export default {
       return map[type];
     },
 
+    //商品信息映射函数
+    goodsInfoFormatChange(type) {
+      //映射仓库
+      const map = {
+        1: "香蕉",
+        2: "樱桃",
+        3: "蓝莓",
+        4: "西瓜",
+        5: "草莓",
+        17: "树莓",
+        18: "草莓"
+      };
+      return map[type];
+
+
+    },
+
     //获取订单表数据
     getOrder() {
       this.$axios({
@@ -297,13 +356,22 @@ export default {
     // 点击新增时，把数据添加到数据库
     //在这里更改了函数 的名字
 
-    //新增订单测试函数
-    datatest() {
-      console.log("点击了添加订单");
-      console.log(this.dateValue);
-    },
+    //新增订单测试函数      // 订单的表单验证
+    orderCheck() {
 
+      this.bufferData.forEach((item) => {
+        if (item.orderNum === this.inputOrderNum) {
+          this.$message({
+            message: "订单名重复，请重新输入",
+            type: "warning",
+          });
+          return;
+        }
+      })
+    }
+    ,
     dataAdd() {
+
       //将多选框的值转换成对应的数字
       this.wareHouseNumber = Number(this.wareHouseoptions.value);
       this.logisticcompanyNumber = Number(this.logisticcompanyoptions.value);

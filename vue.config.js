@@ -27,7 +27,7 @@ module.exports = defineConfig({
     // outputDir: 'dist',
     devServer: {
         // port: 8080,
-        // open: true, // 自动打开浏览器
+        // open: true, // 自动打开浏览器  http://192.168.49.185:6060/
         proxy: {
             "/api": {
                 // target: 'http://150.158.191.133:8080/fruittimeerp',
@@ -37,7 +37,7 @@ module.exports = defineConfig({
                 pathRewrite: {
                     '^/api': ''
                 },
-            }
+            },
         },
     },
 })

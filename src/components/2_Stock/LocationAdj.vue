@@ -35,11 +35,19 @@
         <el-form-item>
           <el-button type="primary" @click="getLocationAdj"> 查询 </el-button>
         </el-form-item>
+        <el-form-item>
+          <el-button
+            type="success"
+            @click="refresh"
+            icon="el-icon-refresh"
+            class="refresh"
+          ></el-button>
+        </el-form-item>
       </el-form>
     </el-card>
     <!-- 表格数据 -->
     <el-card>
-      <el-button type="primary" @click="outerVisible = true">新增</el-button>
+      <el-button type="primary" @click="outerDialog = true">新增</el-button>
       <el-divider></el-divider>
       <el-table
         ref="multipleTable"
@@ -92,18 +100,30 @@
     </el-card>
 
     <!-- 新增 -->
-    <el-dialog title="库位调整单" :visible.sync="outerVisible">
-      <el-form :model="transferData" style="text-align: left">
+    <el-dialog title="库位调整单" :visible.sync="outerDialog">
+      <el-form
+        :model="transferData"
+        style="text-align: right"
+        :rules="rules"
+        ref="ruleForm"
+        class="demo-ruleForm"
+      >
         <el-row>
-          <el-col :span="11">
-            <el-form-item label="调整编号" :label-width="formLabelWidth">
+          <el-col :span="12">
+            <el-form-item
+              label="调整编号"
+              :label-width="formLabelWidth"
+              prop="adjustNo"
+            >
               <el-input
                 v-model="transferData.adjustNo"
                 autocomplete="off"
+                maxlength="7"
+                @blur="verificationFn"
               ></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="11">
+          <el-col :span="12">
             <el-form-item label="库位编号" :label-width="formLabelWidth">
               <el-select
                 v-model="transferData.locationOutId"
@@ -132,31 +152,45 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item>
+              <el-card>
+                <el-table :data="transferGoodsData" style="width: 100%">
+                  <el-table-column
+                    prop="goodsNumber"
+                    label="商品编码"
+                    width="180"
+                  >
+                  </el-table-column>
+                  <el-table-column
+                    prop="goodsName"
+                    label="商品名称"
+                    width="180"
+                  >
+                  </el-table-column>
+                  <el-table-column
+                    prop="num"
+                    label="商品数量"
+                  ></el-table-column>
+                  <el-table-column prop="warehouseUsefulUnit" label="单位">
+                  </el-table-column>
+                  <el-table-column label="调入库位">
+                    <template slot-scope="scope">
+                      <i
+                        class="el-icon-position"
+                        @click="getTransferInData(scope.row, 'ruleForm')"
+                      ></i>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </el-card>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
-      <el-card>
-        <el-table :data="transferGoodsData" style="width: 100%">
-          <el-table-column prop="goodsNumber" label="商品编码" width="180">
-          </el-table-column>
-          <el-table-column prop="goodsName" label="商品名称" width="180">
-          </el-table-column>
-          <el-table-column prop="num" label="商品数量"></el-table-column>
-          <el-table-column prop="warehouseUsefulUnit" label="单位">
-          </el-table-column>
-          <el-table-column label="调入库位">
-            <template slot-scope="scope">
-              <i
-                class="el-icon-position"
-                @click="getTransferInData(scope.row)"
-              ></i>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-card>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="outerVisible = false">取 消</el-button>
-        <el-button type="primary" @click="outerVisible = false"
-          >确 定</el-button
-        >
+        <el-button @click="close">关 闭</el-button>
       </div>
     </el-dialog>
 
@@ -165,7 +199,13 @@
       <div id="tsTitle">
         商品当前库位 <span>{{ currentLocationName }}</span>
       </div>
-      <el-form :model="transferData" label-width="100px">
+      <el-form
+        :model="transferData"
+        label-width="100px"
+        :rules="rules"
+        ref="ruleForm"
+        class="demo-ruleForm"
+      >
         <el-divider></el-divider>
         <el-form-item label="库位编码">
           <el-select
@@ -184,15 +224,15 @@
         <el-form-item label="库位剩余容量">
           <el-input v-model="transferData.lastCapacity" disabled></el-input>
         </el-form-item>
-        <el-form-item label="所调数量">
+        <el-form-item label="所调数量" prop="adjustNum">
           <el-input v-model="transferData.adjustNum"></el-input>
         </el-form-item>
         <el-form-item label="单位">
           <el-input v-model="transferData.goodsCompany" disabled></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button @click="transferInDialog = false">取消</el-button>
-          <el-button type="primary" @click="add">确定</el-button>
+          <el-button @click="closeAdd">取消</el-button>
+          <el-button type="primary" @click="add('ruleForm')">确定</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -207,11 +247,10 @@ export default {
       pageSize: 10, // 每页条数
       pageTotal: 0, // 数据总条数
       tableData: [], // 表格数据
-      outerVisible: false, // 新增外层dialog
+      outerDialog: false, // 新增外层dialog
       warehouseData: [], // 仓库
       warehouseId: "", // 搜索下拉框仓库id
       locationData: [], // 库位数据
-      goodsDataBylocaId: [], // 根据库位查找的商品信息
       transferGoodsData: [], //新增页面的商品数据
       currentLocationName: "", // 当前库位名称
       transferInDialog: false, // 调入数据
@@ -233,22 +272,45 @@ export default {
       queryFormData: {
         warehouseId: null, // 仓库ID
         adjustNo: "", // 调整单号
-        selectDate: null, // 盘点时间
+        selectDate: "", // 盘点时间
         checkStartTime: "", // 盘点开始时间
         checkEndTime: "", // 盘点结束时间
       },
       formLabelWidth: "120px", // form表单label宽度
+      flag: false, // 验证
+      iptadjustNoSattus: false, // 调整编号输入
+
+      // 规则
+      rules: {
+        adjustNo: [
+          { required: true, message: "请输入调整编码", trigger: "blur" },
+          {
+            message: "请输入正确的编码格式，前两位为大写,后面为数字",
+            pattern: /^[A-Z][A-Z][0-9]\d*$/,
+            trigger: "blur",
+          },
+        ],
+        adjustNum: [
+          { required: true, message: "请输入调整数量", trigger: "blur" },
+          {
+            message: "调整数量应为数字类型",
+            pattern: /^[0-9]\d*$/,
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
+
   methods: {
     // 分页
     handleSizeChange(val) {
-      this.pageSize = val;
       this.getLocationAdj();
+      this.pageSize = val;
     },
     handleCurrentChange(val) {
-      this.currentPage = val;
       this.getLocationAdj();
+      this.currentPage = val;
     },
 
     // 获取仓库数据
@@ -329,9 +391,8 @@ export default {
         },
       })
         .then((res) => {
-          // console.log("库位调整数据信息", res.data.data);
+          console.log("库位调整数据信息", res.data.data);
           if (res.data.code === 0) {
-            // console.log(res.data.data);
             this.tableData = res.data.data;
           }
         })
@@ -342,16 +403,17 @@ export default {
 
     // 获取库位容量
     checkLocation() {
-      console.log(this.transferData.locationOutId);
+      // console.log(this.transferData.locationOutId);
       this.$axios({
         url: "/warehouseLocation/findLastCapacity",
         method: "get",
         params: {
-          id: Number(this.transferData.locationOutId),
+          id: Number(this.transferData.locationInId),
         },
       })
         .then((res) => {
           if (res.data.code === 0) {
+            // console.log(res.data.data);
             this.transferData.lastCapacity = res.data.data;
           }
         })
@@ -361,48 +423,100 @@ export default {
     },
 
     // 点击调入库位按钮
-    getTransferInData(row) {
-      this.transferInDialog = true;
-      this.transferData.goodsCompany = row.warehouseUsefulUnit;
-      this.transferData.goodId = row.goodId;
+    getTransferInData(row, formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          if (this.iptadjustNoSattus == true) {
+            this.$message({
+              type: "error",
+              message: "该调整编号已存在或长度不足7位",
+            });
+            this.iptadjustNoSattus = false;
+          } else {
+            this.transferInDialog = true;
+            this.transferData.goodsCompany = row.warehouseUsefulUnit;
+            this.transferData.goodId = row.goodId;
+          }
+        } else {
+          return false;
+        }
+      });
     },
 
     // 确认新增
-    add() {
-      this.transferData.staffId = sessionStorage.getItem("staffId");
-      this.$axios({
-        url: "/warehouseLocationAdjust/add",
-        method: "post",
-        data: {
-          adjustNo: this.transferData.adjustNo,
-          adjustNum: this.transferData.adjustNum,
-          goodId: this.transferData.goodId,
-          locationInId: this.transferData.locationInId,
-          locationOutId: this.transferData.locationOutId,
-          note: this.transferData.note,
-          staffId: Number(this.transferData.staffId),
-        },
-      })
-        .then((res) => {
-          // console.log(res.data);
-          if (res.data.code === 0) {
-            this.transferInDialog = false;
-            this.getLocationAdj();
-            this.transferData.adjustNo = "";
-            this.transferData.adjustNum = 0;
-            this.transferData.goodId = null;
-            this.transferData.locationInId = null;
-            this.transferData.note = "";
+    add(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          if (this.transferData.lastCapacity < this.transferData.adjustNum) {
+            this.$message({
+              type: "error",
+              message: "所调数量不能大于库位剩余容量",
+            });
+          } else if (this.transferData.adjustNum < 0) {
+            this.$message({
+              type: "error",
+              message: "所调数量不能为负数",
+            });
+          } else {
+            this.transferData.staffId = sessionStorage.getItem("staffId");
+            this.$axios({
+              url: "/warehouseLocationAdjust/add",
+              method: "post",
+              data: {
+                adjustNo: this.transferData.adjustNo,
+                adjustNum: this.transferData.adjustNum,
+                goodId: this.transferData.goodId,
+                locationInId: this.transferData.locationInId,
+                locationOutId: this.transferData.locationOutId,
+                note: this.transferData.note,
+                staffId: Number(this.transferData.staffId),
+              },
+            })
+              .then((res) => {
+                // console.log(res.data);
+                if (res.data.code === 0) {
+                  this.transferInDialog = false;
+                  this.getLocationAdj();
+                  this.transferData.adjustNo = "";
+                  this.transferData.adjustNum = 0;
+                  this.transferData.goodId = null;
+                  this.transferData.locationInId = null;
+                  this.transferData.note = "";
+                }
+              })
+              .catch((err) => {
+                console.log(err);
+              });
           }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+        } else {
+          return false;
+        }
+      });
+    },
+
+    // 关闭调入库位弹出框
+    closeAdd() {
+      this.transferInDialog = false;
+      this.transferData.adjustNo = "";
+      this.transferData.adjustNum = 0;
+      this.transferData.lastCapacity = 0;
+      this.transferData.goodId = null;
+      this.transferData.locationInId = null;
+      this.transferData.note = "";
+    },
+
+    // 关闭调出库位弹出框
+    close() {
+      this.outerDialog = false;
+      this.transferGoodsData = [];
+      this.transferData.adjustNo = "";
+      this.transferData.note = "";
+      this.transferData.locationOutId = null;
     },
 
     // 获取日期周期
     getDate() {
-      console.log(this.queryFormData.selectDate);
+      // console.log(this.queryFormData.selectDate);
       if (this.queryFormData.selectDate !== "") {
         let arr = this.queryFormData.selectDate;
         this.queryFormData.checkStartTime = arr[0];
@@ -428,6 +542,28 @@ export default {
         .catch((err) => {
           console.log(err);
         });
+    },
+
+    // 刷新
+    refresh() {
+      this.queryFormData.warehouseId = null;
+      this.queryFormData.adjustNo = "";
+      this.queryFormData.selectDate = "";
+      this.getLocationAdj();
+    },
+
+    // 表单验证
+    verificationFn() {
+      console.log(this.transferData.adjustNo);
+      this.tableData.forEach((item) => {
+        if (
+          item.adjustNo === this.transferData.adjustNo ||
+          this.transferData.adjustNo.length != 7
+        ) {
+          // console.log("123456", this.transferData.adjustNo);
+          this.iptadjustNoSattus = true;
+        }
+      });
     },
   },
 

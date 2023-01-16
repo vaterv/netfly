@@ -161,8 +161,14 @@ export default {
           url: "/",
           state: 1,
           submenus: [
-            { id: 41, name: "审批管理", url: "/ ", state: 2, submenus: [] },
-            { id: 42, name: "我的审批", url: "/ ", state: 2, submenus: [] },
+            // { id: 41, name: "审批管理", url: "/ ", state: 2, submenus: [] },
+            {
+              id: 42,
+              name: "我的审批",
+              url: "/main/examine",
+              state: 2,
+              submenus: [],
+            },
           ],
         },
         {
@@ -229,8 +235,20 @@ export default {
                 },
               ],
             },
-            { id: 64, name: "订单售后", url: "/main/afterSale", state: 2, submenus: [] },
-            { id: 65, name: "订单查询", url: "/main/queryOrder", state: 2, submenus: [] },
+            {
+              id: 64,
+              name: "订单售后",
+              url: "/main/afterSale",
+              state: 2,
+              submenus: [],
+            },
+            {
+              id: 65,
+              name: "订单查询",
+              url: "/main/queryOrder",
+              state: 2,
+              submenus: [],
+            },
           ],
         },
         {
@@ -257,9 +275,14 @@ export default {
   margin: 0;
   padding: 0;
 }
-
-.home {
-  width: 100%;
+.el-header {
+  padding: 0 0px;
+}
+.el-aside::-webkit-scrollbar {
+  display: none;
+}
+/deep/.home {
+  width: 100vw;
   height: 50px;
   background-color: #ffffff;
 }
@@ -272,5 +295,10 @@ export default {
 .li2 {
   height: 30px;
   padding-left: 40px;
+}
+
+.el-main {
+  padding: 0;
+  background-color: #f1f2f7;
 }
 </style>

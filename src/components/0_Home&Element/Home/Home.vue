@@ -2,51 +2,52 @@
   <div class="content">
     <!-- 第一排图表 -->
     <div class="chart_first">
-      <el-row :gutter="30">
-        <!-- 左侧图表tip -->
-        <el-col :xs="10" :sm="8" :md="7" :lg="6" :xl="5">
-          <div class="grid-content bg-purple">
-            <div class="chart_tip">
-              <div class="tip_icon1">￥</div>
-              <div class="tip_content">
-                <h1>155.3w</h1>
-                <p>MONTHLY SALES</p>
+      <el-card class="box-card">
+        <el-row :gutter="30">
+          <!-- 左侧图表tip -->
+          <el-col :xs="10" :sm="8" :md="7" :lg="6" :xl="5">
+            <div class="grid-content bg-purple">
+              <div class="chart_tip">
+                <div class="tip_icon1">￥</div>
+                <div class="tip_content">
+                  <h1>155.3w</h1>
+                  <p>本月销售</p>
+                </div>
+              </div>
+              <div class="chart_tip">
+                <div class="tip_icon2"><i class="el-icon-s-order"></i></div>
+                <div class="tip_content" id="tip_content2">
+                  <h1>15.9k</h1>
+                  <p>本月订单</p>
+                </div>
+              </div>
+              <div class="chart_tip">
+                <div class="tip_icon3"><i class="el-icon-cherry"></i></div>
+                <div class="tip_content">
+                  <h1>38%</h1>
+                  <p>水果库存余量</p>
+                </div>
               </div>
             </div>
-            <div class="chart_tip">
-              <div class="tip_icon2"><i class="el-icon-s-order"></i></div>
-              <div class="tip_content" id="tip_content2">
-                <h1>15.9k</h1>
-                <p>MONTHLY ORDERS</p>
-              </div>
-            </div>
-            <div class="chart_tip">
-              <div class="tip_icon3"><i class="el-icon-cherry"></i></div>
-              <div class="tip_content">
-                <h1>M: 38%</h1>
-                <p>TYPES PERCENTAGE</p>
-              </div>
-            </div>
-          </div>
-        </el-col>
+          </el-col>
 
-        <el-col :xs="4" :sm="9" :md="9" :lg="12" :xl="15" style="radius: 0px">
-          <div
-            ref="chart1"
-            class="grid-content bg-purple-light"
-            style="radius: 0px"
-          ></div>
-        </el-col>
+          <el-col :xs="4" :sm="9" :md="9" :lg="12" :xl="15" style="radius: 0px">
+            <div
+              ref="chart1"
+              class="grid-content bg-purple-light"
+              style="radius: 0px"
+            ></div>
+          </el-col>
 
-        <el-col :xs="10" :sm="7" :md="8" :lg="6" :xl="4">
-          <div class="grid-content bg-purple">
-            <div ref="chart2" class="chart_right"></div>
-            <div ref="chart3" class="chart_right"></div>
-          </div>
-        </el-col>
-      </el-row>
+          <el-col :xs="10" :sm="7" :md="8" :lg="6" :xl="4">
+            <div class="grid-content bg-purple">
+              <div ref="chart2" class="chart_right"></div>
+              <div ref="chart3" class="chart_right"></div>
+            </div>
+          </el-col>
+        </el-row>
+      </el-card>
     </div>
-    <div ref="chart4" class="chart_map"></div>
   </div>
 </template>
 
@@ -67,7 +68,7 @@ export default {
           title: {
             left: "left",
             text: "155.3w",
-            subtext: "Different Fruit Monthly Sales",
+            subtext: "订单月销折线图",
             textStyle: {
               color: "#6ab04c",
               fontSize: 20,
@@ -88,7 +89,7 @@ export default {
               Apple: false,
               Strawberry: false,
             },
-            data: ["Cherry", "Watermelon", "Banana", "Apple", "Strawberry"],
+            data: ["樱桃", "西瓜", "香蕉", "苹果", "草莓"],
           },
           grid: {
             left: "-5%",
@@ -164,7 +165,7 @@ export default {
           // },
           series: [
             {
-              name: "Cherry",
+              name: "樱桃",
               type: "line",
               stack: "Total",
               data: [
@@ -180,7 +181,7 @@ export default {
               },
             },
             {
-              name: "Watermelon",
+              name: "西瓜",
               type: "line",
               stack: "Total",
               data: [
@@ -196,7 +197,7 @@ export default {
               },
             },
             {
-              name: "Banana",
+              name: "香蕉",
               type: "line",
               stack: "Total",
               data: [
@@ -206,7 +207,7 @@ export default {
               symbolSize: 6, //折线点的大小
             },
             {
-              name: "Apple",
+              name: "苹果",
               type: "line",
               stack: "Total",
               data: [
@@ -216,7 +217,7 @@ export default {
               symbolSize: 6, //折线点的大小
             },
             {
-              name: "Strawberry",
+              name: "草莓",
               type: "line",
               stack: "Total",
               data: [
@@ -247,7 +248,7 @@ export default {
           title: {
             left: "left",
             text: "15.9k",
-            subtext: "Monthly Orders",
+            subtext: "每月订单",
             textStyle: {
               color: "#7c38bc",
               fontSize: 18,
@@ -335,7 +336,7 @@ export default {
           title: {
             left: "left",
             text: "38%",
-            subtext: "Porprotant Of Fruits",
+            subtext: "水果库存余量",
             textStyle: {
               color: "#5cb6ff",
               fontSize: 20,
@@ -385,14 +386,14 @@ export default {
                 "97CBFF",
               ],
               data: [
-                { value: 1848, name: "Strawberry" },
-                { value: 735, name: "Watermelon" },
-                { value: 580, name: "Apple" },
-                { value: 484, name: "Cherry" },
-                { value: 300, name: "Banana" },
-                { value: 580, name: "Peach" },
-                { value: 484, name: "Pear" },
-                { value: 300, name: "Orange" },
+                { value: 1848, name: "草莓" },
+                { value: 735, name: "西瓜" },
+                { value: 580, name: "苹果" },
+                { value: 484, name: "樱桃" },
+                { value: 300, name: "香蕉" },
+                { value: 580, name: "桃子" },
+                { value: 484, name: "梨" },
+                { value: 300, name: "橘子" },
               ],
             },
           ],
@@ -415,12 +416,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.el-card__body {
+  height: 420px;
+}
 .content {
   background-color: #f1f2f7;
   width: 100%;
   padding-top: 30px;
 }
-
 .chart_first {
   width: 97%;
   margin-left: 20px;

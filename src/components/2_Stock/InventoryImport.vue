@@ -52,6 +52,16 @@
               >
             </el-form-item>
           </el-col>
+          <el-col :span="1">
+            <el-form-item>
+              <el-button
+                type="success"
+                @click="refresh"
+                icon="el-icon-refresh"
+                class="refresh"
+              ></el-button>
+            </el-form-item>
+          </el-col>
         </el-row>
       </el-form>
     </el-card>
@@ -110,37 +120,34 @@
 
     <!-- 新增 -->
     <el-dialog title="新增盘点单" :visible.sync="addDialog">
-      <el-form :model="addData">
+      <el-form
+        :model="addData"
+        :rules="rules"
+        ref="ruleForm"
+        class="demo-ruleForm"
+      >
         <el-row>
-          <el-col :span="10">
-            <el-form-item label="盘点编号" :label-width="formLabelWidth">
+          <el-col :span="12">
+            <el-form-item
+              label="盘点编号"
+              prop="checkNum"
+              :label-width="formLabelWidth"
+            >
               <el-input
                 v-model="addData.checkNum"
                 autocomplete="off"
-                maxlength="5"
+                maxlength="6"
+                @blur="verificationFn"
               ></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="10">
-            <el-form-item label="盘点时间" :label-width="formLabelWidth">
-              <el-date-picker
-                v-model="addData.checkTime"
-                type="datetime"
-                placeholder="选择日期时间"
-                format="yyyy-MM-dd HH:mm:ss"
-                disabled
-              >
-              </el-date-picker>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="10">
+          <el-col :span="12">
             <el-form-item label="选择仓库" :label-width="formLabelWidth">
               <el-select
                 v-model="addData.warehouseId"
                 placeholder="请选择仓库"
                 @change="getGoodsByWarehouseId"
+                style="width: 100%"
               >
                 <el-option
                   v-for="item in warehouseData"
@@ -153,7 +160,7 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="20">
+          <el-col :span="24">
             <el-form-item label="备注" :label-width="formLabelWidth">
               <el-input
                 type="textarea"
@@ -163,49 +170,74 @@
             </el-form-item>
           </el-col>
         </el-row>
-      </el-form>
-      <el-divider></el-divider>
-      <el-card>
-        <el-table
-          ref="multipleTable"
-          :data="this.addData.goodsList"
-          tooltip-effect="dark"
-          style="width: 100%"
-          @selection-change="selectGoods"
-        >
-          <el-table-column type="selection" width="55"> </el-table-column>
-          <el-table-column label="商品编码" width="120" prop="goodsNumber">
-          </el-table-column>
-          <el-table-column label="商品名称" width="120" prop="goodsName">
-          </el-table-column>
-          <el-table-column prop="locationNumber" label="所在库位" width="120">
-          </el-table-column>
-          <el-table-column
-            prop="address"
-            label="盘点实存"
-            show-overflow-tooltip
+        <el-row>
+          <el-col :span="24">
+            <el-form-item>
+              <el-card>
+                <el-table
+                  ref="multipleTable"
+                  :data="addData.goodsList"
+                  tooltip-effect="dark"
+                  style="width: 100%"
+                  @selection-change="selectGoods"
+                >
+                  <el-table-column type="selection" width="55">
+                  </el-table-column>
+                  <el-table-column
+                    label="商品编码"
+                    width="120"
+                    prop="goodsNumber"
+                  >
+                  </el-table-column>
+                  <el-table-column
+                    label="商品名称"
+                    width="120"
+                    prop="goodsName"
+                  >
+                  </el-table-column>
+                  <el-table-column
+                    prop="locationNumber"
+                    label="所在库位"
+                    width="120"
+                  >
+                  </el-table-column>
+                  <el-table-column
+                    prop="inventoryCount"
+                    label="盘点实存"
+                    show-overflow-tooltip
+                  >
+                    <template slot-scope="scope">
+                      <el-input v-model="scope.row.inventoryCount"> </el-input>
+                    </template>
+                  </el-table-column>
+                  <el-table-column
+                    prop="num"
+                    label="现有库存"
+                    show-overflow-tooltip
+                  >
+                  </el-table-column>
+                </el-table>
+              </el-card>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item>
+          <el-pagination
+            @size-change="addhandleSizeChange"
+            @current-change="addhandleCurrentChange"
+            :current-page.sync="addCurrentPage"
+            :page-sizes="[3, 5, 7, 10]"
+            :page-size="addPageSize"
+            layout="sizes, prev, pager, next"
+            :total="addPageTotal"
           >
-            <template slot-scope="scope">
-              <el-input v-model="scope.row.inventoryCount"> </el-input>
-            </template>
-          </el-table-column>
-          <el-table-column prop="num" label="现有库存" show-overflow-tooltip>
-          </el-table-column>
-        </el-table>
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page.sync="addCurrentPage"
-          :page-size="addPageSize"
-          layout="prev, pager, next, jumper"
-          :total="addPageTotal"
-        >
-        </el-pagination>
-      </el-card>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="addDialog = false">取 消</el-button>
-        <el-button type="primary" @click="add">确 定</el-button>
-      </div>
+          </el-pagination>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="add('ruleForm')">确 定</el-button>
+          <el-button @click="close">取 消</el-button>
+        </el-form-item>
+      </el-form>
     </el-dialog>
   </div>
 </template>
@@ -227,7 +259,7 @@ export default {
       // 查询数据
       queryFormData: {
         warehouseId: null, // 仓库ID
-        selectDate: null, // 盘点时间
+        selectDate: "", // 盘点时间
         staffName: "", // 制单人
         checkNum: "", // 盘点单号
         checkStartTime: "", // 盘点开始时间
@@ -236,11 +268,10 @@ export default {
       // 新增
       /* 新增内分页 */
       addCurrentPage: 1, // 当前页
-      addPageSize: 10, // 每页显示条数
+      addPageSize: 5, // 每页显示条数
       addPageTotal: null, // 数据总条数
       addData: {
         checkNum: "", // 盘点编号
-        checkTime: new Date(), // 盘点时间
         warehouseId: null, // 仓库ID
         note: "", // 备注
         goodsList: [], // 选择仓库后用于渲染表格的商品数据
@@ -248,16 +279,42 @@ export default {
       addDialog: false, // 新增弹出框
       goodsData: [], // 新增时复选框选中的商品数据
       finallGoodsData: [], // 处理好的商品数据
-      inventoryCount: null, // 盘点实存
+      inventoryCount: 0, // 盘点实存
+      flag: false, // 判断盘点编号标志符
+      inventoryFlag: false, // 盘点实存标志符
+
+      // 规则
+      rules: {
+        checkNum: [
+          { required: true, message: "请输入盘点编码", trigger: "blur" },
+          {
+            message: "请输入PD开头后面为4位数字的盘点编号",
+            pattern: /^PD[0-9]\d*$/,
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
   methods: {
     // 分页
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
+      this.pageSize = val;
+      this.getinventoryData();
     },
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
+      this.currentPage = val;
+      this.getinventoryData();
+    },
+
+    // 新增库存盘点页码
+    addhandleSizeChange(val) {
+      this.addPageSize = val;
+      this.getGoodsByWarehouseId();
+    },
+    addhandleCurrentChange(val) {
+      this.addCurrentPage = val;
+      this.getGoodsByWarehouseId();
     },
 
     // 获取库存盘点数据
@@ -320,7 +377,7 @@ export default {
       })
         .then((res) => {
           // console.log(res.data);
-          // console.log("根据仓库id查询商品", res.data.data.records);
+          console.log("根据仓库id查询商品", res.data.data.records);
           if (res.data.code === 0) {
             this.addData.goodsList = res.data.data.records;
             this.addPageTotal = res.data.data.total;
@@ -332,31 +389,50 @@ export default {
     },
 
     // 新增
-    add() {
-      // console.log("选中的商品数据", this.finallGoodsData);
-      console.log(parseInt(this.addData.checkTime.getTime() / 1000) + "");
-
-      this.$axios({
-        url: "/inventoryCounting/add",
-        method: "post",
-        data: {
-          checkNum: this.addData.checkNum,
-          checkTime: parseInt(this.addData.checkTime.getTime() / 1000) + "",
-          goodsList: this.finallGoodsData,
-          notes: this.addData.note,
-          warehouseId: String(this.addData.warehouseId),
-        },
-      })
-        .then((res) => {
-          console.log(res);
-          if (res.data.code === 0) {
-            this.addDialog = false;
-            this.getinventoryData();
+    add(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          if (this.flag === true) {
+            this.$message({
+              type: "error",
+              message: "该盘点编号已存在或长度不足6位",
+            });
+          } else {
+            this.$axios({
+              url: "/inventoryCounting/add",
+              method: "post",
+              data: {
+                checkNum: this.addData.checkNum,
+                checkTime: parseInt(new Date().getTime()) + "",
+                goodsList: this.finallGoodsData,
+                notes: this.addData.note,
+                warehouseId: this.addData.warehouseId,
+              },
+            })
+              .then((res) => {
+                console.log(res);
+                if (res.data.code === 0) {
+                  this.addDialog = false;
+                  this.getinventoryData();
+                }
+              })
+              .catch((err) => {
+                console.log(err);
+              });
           }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+        } else {
+          return false;
+        }
+      });
+    },
+
+    // 关闭新增
+    close() {
+      this.addDialog = false;
+      this.addData.checkNum = "";
+      this.addData.goodsList = [];
+      this.addData.warehouseId = null;
+      this.addData.note = "";
     },
 
     // 获取盘点时间周期
@@ -368,10 +444,9 @@ export default {
       // console.log("结束日期", this.queryFormData.checkEndTime); // 结束日期 1660579200000
     },
 
-    // 复选框选中的商品数据
+    // 复选框选中的商品数据处理
     selectGoods(val) {
       this.goodsData = val;
-      // console.log("勾选数据", this.goodsData);
       this.finallGoodsData = []; // 循环之前清空，不然会重复push
       this.goodsData.map((item) => {
         let obj = {
@@ -380,7 +455,7 @@ export default {
           num: Number(item.inventoryCount),
           status: 0,
         };
-        this.finallGoodsData.push(obj);
+        return this.finallGoodsData.push(obj);
       });
     },
 
@@ -404,6 +479,46 @@ export default {
           console.log(err);
         });
     },
+
+    // 刷新
+    refresh() {
+      this.queryFormData.warehouseId = null;
+      this.queryFormData.staffName = "";
+      this.queryFormData.checkNum = "";
+      this.queryFormData.selectDate = "";
+      this.getinventoryData();
+    },
+
+    // 表单验证
+    verificationFn() {
+      // console.log("222", this.addData.checkNum);
+      this.tableData.forEach((item) => {
+        // console.log("111", item.checkNum);
+        if (
+          item.checkNum === this.addData.checkNum ||
+          this.addData.checkNum.length != 6
+        ) {
+          this.flag = true;
+        }
+      });
+      // console.log(this.addData);
+      // console.log(this.inventoryCount);
+      // this.addData.goodsList.forEach((item) => {
+      //   // console.log(this.inventoryCount);
+      //   if (this.inventoryCount > item.num) {
+      //     this.$message({
+      //       type: "error",
+      //       message: "盘点实存不能大于现有库存",
+      //     });
+      //   }
+      // });
+      // if (!/^[0-9]\d*$/.test(this.inventoryCount)) {
+      //   this.$message({
+      //     type: "error",
+      //     message: "盘点实存应为数字类型的",
+      //   });
+      // }
+    },
   },
 
   mounted() {
@@ -413,8 +528,12 @@ export default {
 };
 </script>
 
-<style scope>
+<style scoped>
 .el-form .el-input {
   width: 100% !important;
+}
+.el-form-item .el-button {
+  float: right;
+  margin: 0 5px;
 }
 </style>

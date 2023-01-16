@@ -17,6 +17,14 @@
             >查询</el-button
           >
         </el-form-item>
+        <el-form-item>
+          <el-button
+            type="success"
+            @click="refresh"
+            icon="el-icon-refresh"
+            class="refresh"
+          ></el-button>
+        </el-form-item>
       </el-form>
     </el-card>
     <el-card>
@@ -185,7 +193,7 @@ export default {
         number: "", //库区编号
       },
       selectWarehouseId: null, // 下拉框的仓库ID
-      warehouseIsLock: null, // 仓库类型
+      warehouseIsLock: null, // 仓库是否锁盘
       tableData: [], // 表格数据
       modifyDialog: false,
       // 修改的数据
@@ -195,8 +203,7 @@ export default {
         zoneId: "", //库区id
       },
       formLabelWidth: "120px", // form表单标签宽度
-      isIptNum: false, // 库区输入状态
-      isIptNumber: false, // 库区编号输入状态
+      flag: false, // 状态值
 
       rules: {
         number: [
@@ -227,7 +234,7 @@ export default {
         method: "get",
       })
         .then((res) => {
-          console.log(res.data.data);
+          // console.log(res.data.data);
           this.warehouseData = res.data.data;
         })
         .catch((err) => {
@@ -266,7 +273,6 @@ export default {
           console.log("库区数据", res.data);
           this.pageTotal = Number(res.data.count);
           this.tableData = res.data.data;
-          console.log(this.tableData);
         })
         .catch((err) => {
           console.log(err);
@@ -285,7 +291,7 @@ export default {
         .then((res) => {
           if (res.data.code === 0) {
             this.getZone(this.selectWarehouseId);
-            console.log(res);
+            // console.log(res);
           }
         })
         .catch((err) => {
@@ -315,10 +321,10 @@ export default {
     addSure(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          if (this.isIptNum == true || this.isIptNumber == true) {
+          if (this.flag == true) {
             this.$message({
               type: "error",
-              message: "库区号或者库区编号已存在,请重新输入",
+              message: "该库区已存在,请重新输入",
             });
             this.addDialog = true;
             this.addFormData.num = ""; // 清空库区号
@@ -359,10 +365,10 @@ export default {
     },
     // 确认修改
     sureModify() {
-      if (this.isIptNum == true || this.isIptNumber == true) {
+      if (this.flag == true) {
         this.$message({
           type: "error",
-          message: "库区号或者库区编号已存在,请重新输入",
+          message: "该库区已存在,请重新输入",
         });
         this.modifyDialog = true;
       } else {
@@ -388,22 +394,29 @@ export default {
       }
     },
 
+    // 刷新
+    refresh() {
+      this.zoneCode = "";
+      this.libraryAreaCode = "";
+      this.getZone();
+    },
+
     // 输入框失焦事件(验证)
     blurFn() {
       this.tableData.forEach((item) => {
         // 新增表单验证
-        if (item.num == this.addFormData.num) {
-          this.isIptNum = true;
-        }
-        if (item.number == this.addFormData.number) {
-          this.isIptNumber = true;
+        if (
+          item.num == this.addFormData.num &&
+          item.number == this.addFormData.number
+        ) {
+          this.flag = true;
         }
         // 修改表单验证
-        if (this.modifyFormData.zone == item.num) {
-          this.isIptNum = true;
-        }
-        if (this.modifyFormData.warehouseCode == item.num) {
-          this.isIptNumber = true;
+        if (
+          this.modifyFormData.zone == item.num &&
+          this.modifyFormData.warehouseCode == item.num
+        ) {
+          this.flag = true;
         }
       });
     },
@@ -415,9 +428,10 @@ export default {
 };
 </script>
 
-<style scope>
+<style scoped>
 .el-dialog {
   border-radius: 10px;
+  width: 200px;
 }
 .el-divider {
   margin: 10px 0 10px 0;
