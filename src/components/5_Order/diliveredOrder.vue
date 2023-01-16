@@ -2,17 +2,26 @@
   <div>
     <el-card class="box-card">
       <!-- <div class="pagetitle">已发货订单</div>-->
-      <el-button type="primary" icon="el-icon-printer" @click="exportExcelSelect">导出订单</el-button>
+      <el-button
+        type="primary"
+        icon="el-icon-printer"
+        @click="exportExcelSelect"
+        >导出订单</el-button
+      >
 
       <el-divider></el-divider>
       <!--表头 -->
-      <el-table v-bind:data="limitDiliveredData" style="width: 100%" ref="exportTableRef" id="myExport">
+      <el-table
+        v-bind:data="limitDiliveredData"
+        style="width: 100%"
+        ref="exportTableRef"
+        id="myExport"
+      >
         <el-table-column label="订单编号" prop="orderNum"> </el-table-column>
         <el-table-column label="下单时间" prop="orderTime">
           <template slot-scope="scope">
             {{ scope.row.orderTime | dateFmt("YYYY-MM-DD") }}
           </template>
-
         </el-table-column>
         <el-table-column label="买家姓名" prop="buyerName"> </el-table-column>
 
@@ -20,7 +29,9 @@
         <el-table-column label="重量" prop="weight"> </el-table-column>
         <el-table-column label="查看订单详情">
           <template slot-scope="scope">
-            <el-button type="text" @click="showDialog(scope.row.id)">查看订单的详情</el-button>
+            <el-button type="text" @click="showDialog(scope.row.id)"
+              >查看订单的详情</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -32,16 +43,27 @@
         <el-form :model="form">
           <el-form-item>
             <el-table :data="dialogTableData">
-              <el-table-column property="orderNum" label="订单号"></el-table-column>
-              <el-table-column property="goodsName" label="商品名称"></el-table-column>
+              <el-table-column
+                property="orderNum"
+                label="订单号"
+              ></el-table-column>
+              <el-table-column
+                property="goodsName"
+                label="商品名称"
+              ></el-table-column>
 
-              <el-table-column property="realPay" label="商品金额"></el-table-column>
-              <el-table-column property="orderMsg" label="备注"></el-table-column>
+              <el-table-column
+                property="realPay"
+                label="商品金额"
+              ></el-table-column>
+              <el-table-column
+                property="orderMsg"
+                label="备注"
+              ></el-table-column>
             </el-table>
           </el-form-item>
 
           <div class="myheader">订单信息</div>
-
 
           <!-- 订单信息分区 -->
           <!-- 第二个表格 -->
@@ -53,7 +75,6 @@
               </template>
             </el-table-column>
             <el-table-column label="付款时间" prop="payTime">
-
               <template slot-scope="scope">
                 {{ scope.row.payTime | dateFmt("YYYY-MM-DD") }}
               </template>
@@ -61,8 +82,10 @@
             <el-table-column label="重量" prop="weight"> </el-table-column>
             <el-table-column label="订单运费" prop="freight"> </el-table-column>
 
-            <el-table-column label="卖家备注" prop="sellerMsg"> </el-table-column>
-            <el-table-column label="订单说明" prop="orderMsg"> </el-table-column>
+            <el-table-column label="卖家备注" prop="sellerMsg">
+            </el-table-column>
+            <el-table-column label="订单说明" prop="orderMsg">
+            </el-table-column>
           </el-table>
 
           <el-divider></el-divider>
@@ -72,12 +95,18 @@
           <el-row :gutter="2">
             <el-col :span="6">
               <el-form-item label="收货人姓名">
-                <el-input disabled v-model="this.dialogObject.buyerName"></el-input>
+                <el-input
+                  disabled
+                  v-model="this.dialogObject.buyerName"
+                ></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="收货省">
-                <el-input disabled v-model="this.dialogObject.province"></el-input>
+                <el-input
+                  disabled
+                  v-model="this.dialogObject.province"
+                ></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -95,7 +124,10 @@
           <el-row :gutter="2">
             <el-col :span="6">
               <el-form-item label="收货人昵称">
-                <el-input disabled v-model="this.dialogObject.caller"></el-input>
+                <el-input
+                  disabled
+                  v-model="this.dialogObject.caller"
+                ></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -108,7 +140,12 @@
       </el-dialog>
 
       <!-- 这是分页 -->
-      <el-pagination @current-change="handlePaging" layout="prev, pager, next, jumper" :total="100">
+      <el-pagination
+        @current-change="handlePaging"
+        layout="prev, pager, next, jumper"
+        :total="count"
+        :page-size="5"
+      >
       </el-pagination>
     </el-card>
   </div>
@@ -117,17 +154,18 @@
 <script>
 // 引入导出表格的工具
 import FileSaver from "file-saver";
-import XLSX from "xlsx"
-
+import XLSX from "xlsx";
+// import htmlToExcel from '@/util/htmlToExcel';
 
 export default {
   name: "diliveredOrder",
   data() {
     return {
       // 测试日期
-      value3: '',
+      value3: "",
       readDate: "",
-
+      // 用来装从后端返回的所有的页数
+      count: 0,
       //表格中的数据
       tableData: [],
       //后端分页已发货数据
@@ -155,11 +193,6 @@ export default {
     this.getTableData(1);
   },
   methods: {
-
-
-
-
-
     //通过传入行数参数来展示模态框
     showDialog(rowId) {
       console.log("拿到的唯一id是", rowId);
@@ -170,14 +203,8 @@ export default {
           this.dialogObject = item;
           this.dialogTableData = [];
           this.dialogTableData.push(this.dialogObject);
-          // console.log('模态框中的是',this.dialogTableData)
-          // console.log('该对象是',this.dialogObject)
-          //通过rowId再次查询订单表--->再查询客户表中的收货人信息
-
-
         }
       });
-
     },
 
     //向后端发起请求分页数据
@@ -194,7 +221,10 @@ export default {
         .then((res) => {
           if (res.status === 200) {
             this.limitDiliveredData = res.data.data;
-            console.log("返回的数据是", this.limitDiliveredData);
+            console.log("已发货订单返回的数据是", res);
+            // 获取总条数
+            this.count = res.data.count;
+            console.log("获取到的总条数是", this.count);
           } else {
             console.log("出错了");
           }
@@ -203,12 +233,16 @@ export default {
           console.log(err);
         });
     },
+
+    // 获取已发货订单的总条数
+
     //点击然后触发向后端发起请求的函数
     handlePaging(val) {
       this.getTableData(val);
     },
-    exportExcelSelect() {
 
+    // 数据转换成表格
+    exportExcelSelect() {
       // 另一种名字
       // 获取表格元素
       // const els = this.$refs.exportTableRef;
@@ -217,7 +251,7 @@ export default {
       // /* generate workbook object from table */
       // const wb = XLSX.utils.table_to_book(els);
       /* 或者用id */
-      const wb = XLSX.utils.table_to_book(document.getElementById("myExport"))
+      const wb = XLSX.utils.table_to_book(document.getElementById("myExport"));
       /* get binary string as output */
       const wbout = XLSX.write(wb, {
         bookType: "xlsx",
@@ -233,38 +267,8 @@ export default {
         console.log(e);
       }
       return wbout;
-    }
-
-
-
-
-
-    // 导出转换函数
-    // exportExcel() {
-    //   htmlToExcel.getExcel('#limitDiliveredData', '导出的自定义标题')
-    // },
-
-    // exportExcelSelect() {
-    //   // if (this.limitDiliveredData.length < 1) {
-    //   //   this.$message.error('请选择要导出的内容！');
-    //   //   return false;
-    //   // }
-    //   this.selectWindow = true;
-    //   console.log('导出进行到这一步');
-    //   this.exportExcel()
-    // },
-
-    // handleSelectionChange(val) {
-    //   this.selectData = val;
-    // }
-
-
-
-  }
-
-
-
-
+    },
+  },
 };
 </script>
 
@@ -288,7 +292,6 @@ export default {
 
 /* 设置页码居中 */
 .el-pagination {
-  text-align: center;
   margin-top: 20px;
 }
 

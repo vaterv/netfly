@@ -1,93 +1,93 @@
 <template>
   <div id="myCss">
     <el-card class="box-card">
-      <!-- <div class="pagetitle">新订单</div>
-      <el-divider></el-divider> -->
-      <el-form label-width="100px" class="demo-ruleForm">
-        <!-- 用查询页面的排序方式 -->
-        <el-row :gutter="10">
-          <el-col :span="6">
-            <el-form>
-              <el-form-item label="订单号" label-width="126px" :rules="[{ required: true, message: '订单号不能为空' }]"
-                prop="inputOrderNum" size="medium">
-                <el-input v-model="inputOrderNum" @blur="orderCheck"></el-input>
-              </el-form-item>
-            </el-form>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label=" 选择仓库" class="width_single">
-              <el-select v-model="wareHouseoptions.value" placeholder="请选择仓库">
-                <el-option v-for="(item, index) in wareHouseoptions" :key="index" :value="item.id" :label="item.value"
-                  size="mideum">
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label=" 物流公司" class="width_single">
-              <el-select v-model="logisticcompanyoptions.value" placeholder="请选择物流公司" size="medium">
-                <el-option v-for="(item, index) in logisticcompanyoptions" :key="index" :value="item.id"
-                  :label="item.value">
-                </el-option>
-              </el-select>
-            </el-form-item>
+      <el-form
+        :inline="true"
+        class="demo-form-inline"
+        :model="addOrder"
+        :rules="addRule"
+      >
+        <el-form-item
+          label="运费"
+          class="width_single"
+          prop="goodsFreight"
+          :rules="[{ required: true, message: '运费不能为空' }]"
+        >
+          <el-input v-model="addOrder.goodsFreight" placeholder="请输入运费">
+          </el-input>
+        </el-form-item>
 
-            <el-form> </el-form>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="下单时间" label-width="106px">
-              <el-date-picker size="medium" v-model="orderTime" type="datetime" placeholder="选择日期时间"
-                value-format="timestamp" class="datePickerStyle">
-              </el-date-picker>
-            </el-form-item>
-          </el-col>
-        </el-row>
+        <el-form-item label="商品名" prop="goodsInfo">
+          <el-input
+            v-model="addOrder.goodsInfo"
+            placeholder="商品名称"
+          ></el-input>
+        </el-form-item>
 
-        <!-- 新订单的第二行 -->
+        <el-form-item label=" 物流公司" class="width_single">
+          <el-select
+            v-model="logisticcompanyoptions.value"
+            placeholder="请选择物流公司"
+            size="medium"
+          >
+            <el-option
+              v-for="(item, index) in logisticcompanyoptions"
+              :key="index"
+              :value="item.id"
+              :label="item.value"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
 
-        <!-- 新订单的第三行 -->
-        <el-row :gutter="10">
-          <el-col :span="6">
-            <el-form>
-              <el-form-item label="收货人" label-width="126px" :rules="[{ required: true, message: '收货人不能为空' }]"
-                size="medium" prop="receiver">
-                <el-input v-model="receiverName"></el-input>
-              </el-form-item>
-            </el-form>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="商品信息" class="width_single" :rules="[{ required: true, message: '商品信息不能为空' }]"
-              prop="receiver">
-              <el-input v-model="goodsInfo" placeholder="请输入商品信息">
-              </el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="重量" class="width_single" prop="receiver"
-              :rules="[{ required: true, message: '重量不能为空' }]">
-              <el-input v-model="goodsWeight" placeholder="请输入重量" prop="receiver">
-              </el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="运费" class="width_single" prop="receiver"
-              :rules="[{ required: true, message: '运费不能为空' }]">
-              <el-input v-model="goodsFreight" placeholder="请输入运费">
-              </el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="22">
-            <div class="mywhite"></div>
-          </el-col>
-          <el-col :span="1">
-            <el-button type="primary" @click="dataAdd">添加</el-button>
-          </el-col>
-        </el-row>
+        <el-form-item label="下单时间">
+          <el-date-picker
+            size="medium"
+            v-model="orderTime"
+            type="datetime"
+            placeholder="选择日期时间"
+            value-format="timestamp"
+            class="datePickerStyle"
+          >
+          </el-date-picker>
+        </el-form-item>
+
+        <el-form-item label="重量" class="width_single" prop="goodsWeight">
+          <el-input v-model="addOrder.goodsWeight" placeholder="请输入重量">
+          </el-input>
+        </el-form-item>
+
+        <el-form-item label="订单号" prop="inputOrderNum">
+          <el-input
+            v-model="addOrder.inputOrderNum"
+            placeholder="订单号"
+            @blur="orderCheck"
+          ></el-input>
+        </el-form-item>
+
+        <el-form-item label=" 选择仓库" class="width_single">
+          <el-select v-model="wareHouseoptions.value" placeholder="请选择仓库">
+            <el-option
+              v-for="(item, index) in wareHouseoptions"
+              :key="index"
+              :value="item.id"
+              :label="item.value"
+              size="mideum"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item>
+          <div class="mywhite"></div>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="dataAdd" class="myAddBtn"
+            >添加</el-button
+          >
+        </el-form-item>
       </el-form>
     </el-card>
-    <!-- <el-divider></el-divider> -->
 
     <!-- --------------------------------展示表格----------------------------------- -->
     <el-card class="box-card">
@@ -136,7 +136,13 @@
         <!-- 切换发货状态的开关 -->
         <el-table-column label="点击发货" prop="orderStatus" width="100">
           <template slot-scope="scope">
-            <el-button type="success" plain icon="el-icon-s-goods" circle @click="changeStatus(scope.row.id)">
+            <el-button
+              type="success"
+              plain
+              icon="el-icon-s-goods"
+              circle
+              @click="changeStatus(scope.row.id)"
+            >
             </el-button>
           </template>
         </el-table-column>
@@ -144,8 +150,16 @@
         <!-- 删除订单的操作 -->
         <el-table-column label="订单操作">
           <template slot-scope="scope">
-            <el-popconfirm @confirm="delOrder(scope.row.id)" title="确定删除该订单吗？">
-              <el-button type="danger" icon="el-icon-delete" circle slot="reference">
+            <el-popconfirm
+              @confirm="delOrder(scope.row.id)"
+              title="确定删除该订单吗？"
+            >
+              <el-button
+                type="danger"
+                icon="el-icon-delete"
+                circle
+                slot="reference"
+              >
               </el-button>
             </el-popconfirm>
           </template>
@@ -153,8 +167,12 @@
       </el-table>
 
       <!-- 这是分页 -->
-      <el-pagination @current-change="handlePaging" :page-size="this.size" layout="prev, pager, next, jumper"
-        :total="1000">
+      <el-pagination
+        @current-change="handlePaging"
+        :page-size="this.size"
+        layout="prev, pager, next, jumper"
+        :total="myCalcTotal"
+      >
       </el-pagination>
     </el-card>
   </div>
@@ -165,7 +183,51 @@
 export default {
   data() {
     return {
+      // 添加验证规则
+      addOrder: {
+        inputOrderNum: "",
+        goodsInfo: "",
+        goodsWeight: "",
+        goodsFreight: "",
+      },
+      // 添加订单规则
+      addRule: {
+        inputOrderNum: [
+          { required: true, message: "请输入订单号", trigger: "blur" },
+          {
+            min: 3,
+            max: 20,
+            message: "长度在 3 到 20 个字符",
+            trigger: "blur",
+          },
+        ],
+        goodsInfo: [
+          {
+            required: true,
+            message: "请输入商品名",
+            trigger: "blur",
+          },
+        ],
+        goodsWeight: [
+          {
+            required: true,
+            message: "请输入重量名",
+            trigger: "blur",
+          },
+        ],
+        goodsFreight: [
+          {
+            required: true,
+            message: "请输入运费",
+            trigger: "blur",
+          },
+        ],
+      },
+
       value: true,
+      // 定义总的页数
+      myCalcTotal: "",
+
       // 获取商品表、
       // 所有的商品
       goodsAllTable: [],
@@ -175,15 +237,11 @@ export default {
       // 装商品表的名字
       goodsNameTable: [],
 
-
-
       //添加时间
       orderTime: "",
       //收货人
       receiverName: "",
-      goodsInfo: "",
-      goodsWeight: "",
-      goodsFreight: "",
+
       //新订单
       inputOrderNum: "",
       //用来装后端分页获取到的数据
@@ -220,10 +278,12 @@ export default {
       wareHouseoptions: [
         { id: "1", value: "福建仓库" },
         { id: "2", value: "成都仓库" },
-        { id: "1", value: "福建仓库2号" },
-        { id: "2", value: "福建仓库3号" },
-        { id: "1", value: "山西仓库" },
-        { id: "2", value: "重庆仓库" },
+        { id: "3", value: "福建仓库2号" },
+        { id: "4", value: "福建仓库3号" },
+        { id: "7", value: "山西仓库" },
+        { id: "8", value: "重庆仓库" },
+        { id: "11", value: "德阳仓库" },
+        { id: "12", value: "广东仓库" },
       ],
 
       //转换成数值后的储存变量的地方
@@ -261,22 +321,20 @@ export default {
 
     // 获取商品表中的数据
 
-
     this.$axios({
       method: "get",
       url: "/goodsData/findAll",
     })
       .then((res) => {
         if (res) {
-          console.log("0服务器返回的商品数据是", res.data.data);
+          // console.log("0服务器返回的商品数据是", res.data.data);
           // 用遍历的方法把数组对象中的id装到新的数组中
           this.goodsAllTable = res.data.data;
           this.goodsAllTable.forEach((item) => {
             this.goodsIdTable.push(item.id);
-          })
+          });
           // 最后查看这个数组
-          console.log('得到的id数组是', this.goodsIdTable);
-
+          // console.log("得到的id数组是", this.goodsIdTable);
         } else {
           console.log("出错了");
         }
@@ -284,9 +342,6 @@ export default {
       .catch((err) => {
         console.log(err);
       });
-
-
-
   },
   methods: {
     //格式转换函数
@@ -309,8 +364,10 @@ export default {
         2: "成都仓库",
         3: "福建仓库2号",
         4: "福建仓库3号",
-        5: "山西仓库",
-        6: "重庆仓库",
+        7: "山西仓库",
+        8: "重庆仓库",
+        11: "德阳仓库",
+        12: "广东仓库",
       };
       return map[type];
     },
@@ -325,11 +382,9 @@ export default {
         4: "西瓜",
         5: "草莓",
         17: "树莓",
-        18: "草莓"
+        18: "草莓",
       };
       return map[type];
-
-
     },
 
     //获取订单表数据
@@ -340,10 +395,10 @@ export default {
       })
         .then((res) => {
           if (res) {
-            console.log("0服务器返回的是", res.data.data);
+            // console.log("0服务器返回的是", res.data.data);
             this.bufferData = res.data.data;
             this.limitTableData = res.data.data;
-
+            this.myCalcTotal = res.data.data.length;
             this.limitTableData = this.limitTableData.slice(0, 5);
           } else {
             console.log("出错了");
@@ -358,41 +413,40 @@ export default {
 
     //新增订单测试函数      // 订单的表单验证
     orderCheck() {
-
       this.bufferData.forEach((item) => {
-        if (item.orderNum === this.inputOrderNum) {
+        if (item.orderNum === this.addOrder.inputOrderNum) {
           this.$message({
             message: "订单名重复，请重新输入",
             type: "warning",
           });
           return;
         }
-      })
-    }
-    ,
+      });
+    },
     dataAdd() {
-
+      this.getOrder();
+      this.orderCheck();
       //将多选框的值转换成对应的数字
       this.wareHouseNumber = Number(this.wareHouseoptions.value);
       this.logisticcompanyNumber = Number(this.logisticcompanyoptions.value);
-      // console.log('选择的时间值是',this.orderTime);
-      // console.log('选择的订单号是',this.inputOrderNum);
-      // console.log('选择的仓库是',this.wareHouseNumber);
-      // console.log('选择的物流公司值是',this.logisticcompanyNumber);
-
-      //       console.log('收货人是',this.receiverName);
-      // console.log('商品信息是',this.goodsInfo);
-      // console.log('重量',this.goodsWeight);
-      // console.log('运费',this.logisticcompanyNumber);
+      console.log(
+        "获取到的值",
+        this.orderTime,
+        this.goodsWeight,
+        this.goodsFreight,
+        this.logisticcompanyNumber,
+        this.inputOrderNum,
+        this.wareHouseNumber,
+        this.inputOrderNum
+      );
       // //判断新增订单内容是否为空
       if (
         this.orderTime === "" ||
-        this.goodsWeight === "" ||
-        this.goodsFreight === "" ||
+        this.addOrder.goodsWeight === "" ||
+        this.addOrder.goodsFreight === "" ||
         this.logisticcompanyNumber === "" ||
-        this.inputOrderNum === "" ||
-        this.wareHouseNumber === "" ||
-        this.inputOrderNum === ""
+        this.addOrder.inputOrderNum === "" ||
+        this.wareHouseNumber === ""
       ) {
         this.$message({
           message: "请输入完整订单内容",
@@ -470,6 +524,7 @@ export default {
               message: "删除新订单成功",
               type: "success",
             });
+            this.getOrder();
           } else {
             console.log("出错了");
             this.$message({
@@ -484,10 +539,7 @@ export default {
 
       this.centerDialogVisible = false;
     },
-    //修改订单的函数
-    editOrder() {
-      console.log("点击了修改状态按钮");
-    },
+
     //修改顶单状态的函数
     changeStatus(rowId) {
       console.log("点击了切换按钮", rowId);
@@ -560,12 +612,16 @@ export default {
           console.log(err);
         });
     },
-    /************现在已经弃用***********/
   },
 };
 </script>
 
 <style>
+/* 设置按钮 */
+.myAddBtn {
+  margin-left: 170px;
+}
+
 /* 与主题相同的背景色 */
 main.el-main {
   background-color: #f1f2f7;
@@ -591,7 +647,6 @@ main.el-main {
 
 /* 设置页码居中 */
 .el-pagination {
-  text-align: center;
   margin-top: 10px;
 }
 
