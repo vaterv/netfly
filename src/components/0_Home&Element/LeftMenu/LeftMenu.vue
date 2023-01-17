@@ -5,7 +5,7 @@
     text-color="rgb(206, 206, 206)"
     active-text-color="#fff"
     id="menu_box"
-    :default-openeds="['2', '6', '7']"
+    :default-openeds="['6', '61','7']"
     :router="true"
   >
     <template v-for="item in list">
